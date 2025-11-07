@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
   const { user, token, loading, logout } = useAuth();
@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -16,10 +16,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Brand Text Only */}
-          <Link 
-            to="/books" 
-            className="group"
-          >
+          <Link to="/books" className="group">
             <span className="text-lg font-semibold text-white group-hover:text-cyan-400 transition-colors">
               IT Literature Shop
             </span>
@@ -27,26 +24,32 @@ const Navbar: React.FC = () => {
 
           {/* Navigation Links */}
           <div className="flex items-center gap-8">
-            <Link 
-              to="/books" 
+            <Link
+              to="/books"
               className="text-gray-400 hover:text-white transition-colors text-sm font-medium"
             >
               Books
             </Link>
-            
+
             {token && (
               <>
-                <Link 
-                  to="/transactions" 
+                <Link
+                  to="/transactions"
                   className="text-gray-400 hover:text-white transition-colors text-sm font-medium"
                 >
                   Transactions
                 </Link>
-                <Link 
-                  to="/books/add" 
+                <Link
+                  to="/books/add"
                   className="text-gray-400 hover:text-white transition-colors text-sm font-medium"
                 >
                   Add Book
+                </Link>
+                <Link
+                  to="/cart"
+                  className="text-gray-400 hover:text-white transition-colors text-sm font-medium"
+                >
+                  Cart
                 </Link>
               </>
             )}
@@ -80,7 +83,7 @@ const Navbar: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* Logout Button */}
                     <button
                       onClick={handleLogout}
@@ -91,7 +94,7 @@ const Navbar: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <Link 
+                <Link
                   to="/login"
                   className="px-4 py-1.5 text-sm font-medium text-gray-300 hover:text-white transition-colors"
                 >

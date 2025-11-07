@@ -11,7 +11,6 @@ import TransactionDetail from "./pages/TransactionDetail";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Cart from "./pages/Cart";
 
-
 const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-900 text-gray-100 font-inter">
@@ -48,13 +47,13 @@ const App: React.FC = () => {
             }
           />
           <Route
-  path="/cart"
-  element={
-    <ProtectedRoute>
-      <Cart />
-    </ProtectedRoute>
-  }
-/>
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </main>

@@ -102,7 +102,7 @@ const Cart: React.FC = () => {
       {message && (
         <div
           className={`p-3 mb-4 rounded ${
-            message.includes("✅")
+            message.includes("Success")
               ? "bg-green-800/40 text-green-300 border border-green-700"
               : "bg-red-800/40 text-red-300 border border-red-700"
           }`}
