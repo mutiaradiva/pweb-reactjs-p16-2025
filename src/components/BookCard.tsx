@@ -7,18 +7,18 @@ type BookCardProps = {
     title: string;
     writer: string;
     price: number;
-    stock: number;
+    stock_quantity: number;
     genre_id?: string;
     publish_date?: string;
   };
   onDelete: (id: string) => void;
-  genres?: Array<{ id: string; name: string }>;
+  genre?: Array<{ id: string; name: string }>;
 };
 
-const BookCard: React.FC<BookCardProps> = ({ book, onDelete, genres }) => {
+const BookCard: React.FC<BookCardProps> = ({ book, onDelete, genre }) => {
   const getGenreName = (genreId?: string) => {
-    if (!genreId || !genres) return null;
-    const genre = genres.find(g => g.id === genreId);
+    if (!genreId || !genre) return null;
+    const genre = genre.find(g => g.id === genreId);
     return genre?.name;
   };
 
@@ -70,8 +70,8 @@ const BookCard: React.FC<BookCardProps> = ({ book, onDelete, genres }) => {
         
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500">Stock</span>
-          <span className={`font-medium ${book.stock > 0 ? 'text-green-400' : 'text-red-400'}`}>
-            {book.stock} units
+          <span className={`font-medium ${book.stock_quantity > 0 ? 'text-green-400' : 'text-red-400'}`}>
+            {book.stock_quantity} units
           </span>
         </div>
       </div>

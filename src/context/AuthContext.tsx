@@ -24,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
+  // 🔹 Fetch current user profile
   const fetchUserProfile = async () => {
     if (!token) {
       setLoading(false);
@@ -33,40 +34,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await axios.get('/auth/me');
       console.log('User profile response:', res.data);
-      
-      // Handle different response formats
-      const userData = res.data.user || res.data.data?.user || res.data;
+
+      // Adapt to flexible API formats
+      const userData = res.data.user || res.data.data?.user || res.data.data || res.data;
       setUser(userData);
     } catch (error: any) {
       console.error('Failed to fetch user profile:', error.response?.data || error);
-      // Token invalid/expired, clear auth
-      setUser(null);
-      setToken(null);
-      localStorage.removeItem('token');
+      // Token invalid or expired
+      logout();
     } finally {
       setLoading(false);
     }
   };
 
+  // 🔹 Re-run when token changes
   useEffect(() => {
     fetchUserProfile();
   }, [token]);
 
+  // 🔹 Login
   const login = async (email: string, password: string) => {
     try {
       console.log('Attempting login with:', { email });
+
       const res = await axios.post('/auth/login', { email, password });
       console.log('Login response:', res.data);
-      
-      // Handle different response formats
+
+      // Handle flexible formats
       const responseData = res.data.data || res.data;
       const t = responseData.token || responseData.access_token;
       const userData = responseData.user || { email };
-      
-      if (!t) {
-        throw new Error('No token received from server');
-      }
-      
+
+      if (!t) throw new Error('No token received from server');
+
       localStorage.setItem('token', t);
       setToken(t);
       setUser(userData);
@@ -76,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // 🔹 Register
   const register = async (email: string, password: string) => {
     try {
       console.log('Attempting register with:', { email });
@@ -87,23 +88,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // 🔹 Logout
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
   };
 
+  // 🔹 Refresh user data manually
   const refreshUser = async () => {
     await fetchUserProfile();
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, login, register, logout, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
