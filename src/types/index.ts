@@ -4,10 +4,11 @@ export type Book = {
   writer: string;
   publisher?: string;
   publication_year?: number;
+  description: string;
   price: number;
   stock_quantity: number;
   genre_id?: string;
-  publish_date?: string;
+  created_at?: string;
 };
 
 export type Genre = {

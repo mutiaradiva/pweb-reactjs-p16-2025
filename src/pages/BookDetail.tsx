@@ -16,7 +16,10 @@ const BookDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Fetch book & genre data
   useEffect(() => {
@@ -51,13 +54,19 @@ const BookDetail: React.FC = () => {
     setMessage(null);
 
     if (!token) {
-      setMessage({ type: "error", text: "Please login first to make a purchase." });
+      setMessage({
+        type: "error",
+        text: "Please login first to make a purchase.",
+      });
       navigate("/login");
       return;
     }
 
     if (!user?.id) {
-      setMessage({ type: "error", text: "User information not available. Please login again." });
+      setMessage({
+        type: "error",
+        text: "User information not available. Please login again.",
+      });
       navigate("/login");
       return;
     }
@@ -76,7 +85,10 @@ const BookDetail: React.FC = () => {
       const res = await axios.post("/transactions", payload);
       const transactionId = res.data.data?.id || res.data.id;
 
-      setMessage({ type: "success", text: "Purchase successful! Redirecting..." });
+      setMessage({
+        type: "success",
+        text: "Purchase successful! Redirecting...",
+      });
 
       // Redirect after short delay
       setTimeout(() => navigate(`/transactions/${transactionId}`), 1500);
@@ -84,7 +96,8 @@ const BookDetail: React.FC = () => {
       console.error("Purchase error:", err);
       setMessage({
         type: "error",
-        text: err?.response?.data?.message || "Purchase failed. Please try again.",
+        text:
+          err?.response?.data?.message || "Purchase failed. Please try again.",
       });
     }
   };
@@ -95,7 +108,10 @@ const BookDetail: React.FC = () => {
 
     try {
       await axios.delete(`/books/${id}`);
-      setMessage({ type: "success", text: "Book deleted successfully! Redirecting..." });
+      setMessage({
+        type: "success",
+        text: "Book deleted successfully! Redirecting...",
+      });
       setTimeout(() => navigate("/books"), 1500);
     } catch (err: any) {
       setMessage({
@@ -109,7 +125,9 @@ const BookDetail: React.FC = () => {
   if (loading) return <Loader />;
   if (error) return <ErrorBox message={error} />;
   if (!book)
-    return <div className="text-center py-16 text-gray-400">Book not found</div>;
+    return (
+      <div className="text-center py-16 text-gray-400">Book not found</div>
+    );
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -140,8 +158,40 @@ const BookDetail: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-1">{book.title}</h1>
+              <h1 className="text-3xl font-bold text-white mb-1">
+                {book.title}
+              </h1>
               <p className="text-lg text-gray-400">by {book.writer}</p>
+
+              {/* Meta row: genre + year + (optional) publisher */}
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                {genre?.name && (
+                  <span className="inline-flex items-center rounded-md border border-gray-700 bg-black/40 px-2.5 py-1 text-gray-300">
+                    Genre:
+                    <span className="ml-1 font-medium text-white">
+                      {genre.name}
+                    </span>
+                  </span>
+                )}
+
+                {typeof book.publication_year === "number" && (
+                  <span className="inline-flex items-center rounded-md border border-gray-700 bg-black/40 px-2.5 py-1 text-gray-300">
+                    Year:
+                    <span className="ml-1 font-medium text-white">
+                      {book.publication_year}
+                    </span>
+                  </span>
+                )}
+
+                {book.publisher && (
+                  <span className="inline-flex items-center rounded-md border border-gray-700 bg-black/40 px-2.5 py-1 text-gray-300">
+                    Publisher:
+                    <span className="ml-1 font-medium text-white">
+                      {book.publisher}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
 
             {token && (
@@ -151,25 +201,6 @@ const BookDetail: React.FC = () => {
               >
                 Delete Book
               </button>
-            )}
-          </div>
-
-          {/* Genre & Publish Info */}
-          <div className="flex flex-wrap items-center gap-3 mb-8">
-            {genre && (
-              <div className="px-3 py-1.5 bg-cyan-900/30 border border-cyan-800/50 text-cyan-300 text-sm rounded-lg">
-                {genre.name}
-              </div>
-            )}
-            {book.publish_date && (
-              <div className="px-3 py-1.5 bg-gray-800 text-gray-300 text-sm rounded-lg">
-                Published:{" "}
-                {new Date(book.publish_date).toLocaleDateString("id-ID", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </div>
             )}
           </div>
 
@@ -193,10 +224,24 @@ const BookDetail: React.FC = () => {
             </div>
           </div>
 
+          {/* Description */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-white mb-2">
+              Description
+            </h3>
+            <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+              {book.description?.trim()
+                ? book.description
+                : "No description available."}
+            </p>
+          </div>
+
           {/* Purchase Section */}
           {book.stock_quantity > 0 ? (
             <div className="border-t border-gray-800 pt-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Purchase</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">
+                Purchase
+              </h3>
 
               <div className="flex flex-col sm:flex-row items-end gap-4">
                 <div className="flex-1 w-full">
@@ -210,7 +255,10 @@ const BookDetail: React.FC = () => {
                     value={quantity}
                     onChange={(e) =>
                       setQuantity(
-                        Math.max(1, Math.min(book.stock_quantity, Number(e.target.value)))
+                        Math.max(
+                          1,
+                          Math.min(book.stock_quantity, Number(e.target.value))
+                        )
                       )
                     }
                     className="w-full px-4 py-2.5 bg-black border border-gray-800 focus:border-cyan-600 rounded-lg text-white focus:outline-none transition-colors"

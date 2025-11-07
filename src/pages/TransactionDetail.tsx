@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import axios from '../api/axiosConfig';
-import Loader from '../components/Loader';
-import ErrorBox from '../components/ErrorBox';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "../api/axiosConfig";
+import Loader from "../components/Loader";
+import ErrorBox from "../components/ErrorBox";
 
-interface OrderItem {
-  id: string;
+interface Items {
   book_id: string;
   book_title?: string;
   quantity: number;
-  price?: number; // nanti backend kirim harga per item
+  subtotal_price?: number; // nanti backend kirim harga per item
 }
 
 interface Transaction {
@@ -17,7 +16,7 @@ interface Transaction {
   user_id: string;
   created_at?: string;
   updated_at?: string;
-  order_items: OrderItem[];
+  items: Items[];
   total_price?: number; // nanti backend kirim total transaksi
 }
 
@@ -33,14 +32,17 @@ const TransactionDetail: React.FC = () => {
       setError(null);
       try {
         const res = await axios.get(`/transactions/${id}`);
-        console.log('Transaction response:', res.data);
+        console.log("Transaction response:", res.data);
 
         // Swagger terbaru punya responseObject
-        const txData = res.data.data || res.data.responseObject?.[0] || res.data;
+        const txData =
+          res.data.data || res.data.responseObject?.[0] || res.data;
         setTransaction(txData);
       } catch (err: any) {
-        console.error('Fetch transaction error:', err);
-        setError(err?.response?.data?.message || 'Failed to load transaction details');
+        console.error("Fetch transaction error:", err);
+        setError(
+          err?.response?.data?.message || "Failed to load transaction details"
+        );
       } finally {
         setLoading(false);
       }
@@ -60,19 +62,14 @@ const TransactionDetail: React.FC = () => {
 
   // Format tanggal
   const formattedDate = transaction.created_at
-    ? new Date(transaction.created_at).toLocaleString('id-ID', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+    ? new Date(transaction.created_at).toLocaleString("id-ID", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       })
-    : 'Unknown Date';
-
-  // Hitung total sementara jika backend belum kirim total_price
-  const totalAmount =
-    transaction.total_price ||
-    transaction.order_items?.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+    : "Unknown Date";
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8 text-white">
@@ -103,9 +100,9 @@ const TransactionDetail: React.FC = () => {
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Items Purchased</h2>
             <div className="space-y-3">
-              {transaction.order_items?.length ? (
-                transaction.order_items.map((item, index) => {
-                  const price = item.price ?? 0;
+              {transaction.items?.length ? (
+                transaction.items.map((item, index) => {
+                  const price = item.subtotal_price ?? 0;
                   const subtotal = price * item.quantity;
 
                   return (
@@ -119,12 +116,14 @@ const TransactionDetail: React.FC = () => {
                         </p>
                         <p className="text-sm text-gray-400 mt-1">
                           Quantity: {item.quantity}
-                          {price > 0 ? ` × Rp ${price.toLocaleString('id-ID')}` : ''}
+                          {price > 0
+                            ? ` × Rp ${price.toLocaleString("id-ID")}`
+                            : ""}
                         </p>
                       </div>
                       {price > 0 && (
                         <div className="text-cyan-400 font-semibold mt-2 sm:mt-0">
-                          Rp {subtotal.toLocaleString('id-ID')}
+                          Rp {subtotal.toLocaleString("id-ID")}
                         </div>
                       )}
                     </div>
@@ -141,7 +140,7 @@ const TransactionDetail: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xl font-semibold">Total Amount</span>
               <span className="text-3xl font-bold text-cyan-400">
-                Rp {totalAmount?.toLocaleString('id-ID')}
+                Rp {transaction.total_price?.toLocaleString("id-ID")}
               </span>
             </div>
           </div>

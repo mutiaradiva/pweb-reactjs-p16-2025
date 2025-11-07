@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from '../api/axiosConfig';
-import Loader from '../components/Loader';
-import ErrorBox from '../components/ErrorBox';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "../api/axiosConfig";
+import Loader from "../components/Loader";
+import ErrorBox from "../components/ErrorBox";
+import { Link } from "react-router-dom";
 
 interface OrderItem {
   id: string;
@@ -29,7 +29,9 @@ interface TransactionStatistics {
 
 const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [statistics, setStatistics] = useState<TransactionStatistics | null>(null);
+  const [statistics, setStatistics] = useState<TransactionStatistics | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,8 +41,8 @@ const Transactions: React.FC = () => {
       setError(null);
       try {
         const [txRes, statsRes] = await Promise.all([
-          axios.get('/transactions'),
-          axios.get('/transactions/statistics'),
+          axios.get("/transactions"),
+          axios.get("/transactions/statistics"),
         ]);
 
         // Ambil data transaksi
@@ -51,8 +53,8 @@ const Transactions: React.FC = () => {
         const statsData = statsRes.data?.data ?? statsRes.data;
         if (statsData) setStatistics(statsData);
       } catch (err: any) {
-        console.error('Fetch transactions error:', err);
-        setError(err?.response?.data?.message || 'Failed to load transactions');
+        console.error("Fetch transactions error:", err);
+        setError(err?.response?.data?.message || "Failed to load transactions");
         setTransactions([]);
       } finally {
         setLoading(false);
@@ -67,8 +69,12 @@ const Transactions: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">My Transactions</h1>
-        <p className="text-gray-400">View your purchase history and statistics</p>
+        <h1 className="text-3xl font-bold text-white mb-2">
+          Libraries Transactions
+        </h1>
+        <p className="text-gray-400">
+          View libraries purchase history and statistics
+        </p>
       </div>
 
       {error && <ErrorBox message={error} />}
@@ -84,23 +90,27 @@ const Transactions: React.FC = () => {
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
-            <div className="text-gray-400 text-sm mb-2">Avg. Transaction Value</div>
+            <div className="text-gray-400 text-sm mb-2">
+              Avg. Transaction Value
+            </div>
             <div className="text-2xl font-bold text-green-400">
-              Rp {statistics.averageTransactionValue.toLocaleString('id-ID')}
+              Rp {statistics.averageTransactionValue.toLocaleString("id-ID")}
             </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
             <div className="text-gray-400 text-sm mb-2">Most Popular Genre</div>
             <div className="text-2xl font-bold text-yellow-400">
-              {statistics.mostGenre || 'N/A'}
+              {statistics.mostGenre || "N/A"}
             </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
-            <div className="text-gray-400 text-sm mb-2">Least Popular Genre</div>
+            <div className="text-gray-400 text-sm mb-2">
+              Least Popular Genre
+            </div>
             <div className="text-2xl font-bold text-red-400">
-              {statistics.leastGenre || 'N/A'}
+              {statistics.leastGenre || "N/A"}
             </div>
           </div>
         </div>
@@ -123,10 +133,15 @@ const Transactions: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {transactions.map((tx) => {
-            const orderItems = Array.isArray(tx.order_items) ? tx.order_items : [];
+            const orderItems = Array.isArray(tx.order_items)
+              ? tx.order_items
+              : [];
             const totalAmount =
               tx.total_price ??
-              orderItems.reduce((sum, item) => sum + (item.price ?? 0) * item.quantity, 0);
+              orderItems.reduce(
+                (sum, item) => sum + (item.price ?? 0) * item.quantity,
+                0
+              );
 
             return (
               <div
@@ -136,14 +151,16 @@ const Transactions: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <p className="text-sm text-gray-500">Transaction ID</p>
-                    <p className="text-white font-mono text-sm">{tx.id.slice(0, 8)}...</p>
+                    <p className="text-white font-mono text-sm">
+                      {tx.id.slice(0, 8)}...
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-500">Date</p>
                     <p className="text-white text-sm">
                       {tx.created_at
-                        ? new Date(tx.created_at).toLocaleDateString('id-ID')
-                        : 'Unknown Date'}
+                        ? new Date(tx.created_at).toLocaleDateString("id-ID")
+                        : "Unknown Date"}
                     </p>
                   </div>
                 </div>
@@ -152,7 +169,7 @@ const Transactions: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-gray-400">Total Amount</span>
                     <span className="text-xl font-bold text-cyan-400">
-                      Rp {totalAmount.toLocaleString('id-ID')}
+                      Rp {totalAmount.toLocaleString("id-ID")}
                     </span>
                   </div>
                   {orderItems.length > 0 && (
