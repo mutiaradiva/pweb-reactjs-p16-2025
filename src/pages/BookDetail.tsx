@@ -264,13 +264,6 @@ const BookDetail: React.FC = () => {
                     className="w-full px-4 py-2.5 bg-black border border-gray-800 focus:border-cyan-600 rounded-lg text-white focus:outline-none transition-colors"
                   />
                 </div>
-
-                <button
-                  onClick={handleBuyNow}
-                  className="w-full sm:w-auto px-8 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-colors"
-                >
-                  Buy Now
-                </button>
               </div>
 
               <div className="mt-4 text-right">
@@ -285,6 +278,29 @@ const BookDetail: React.FC = () => {
               <p className="text-red-400 font-medium">Out of Stock</p>
             </div>
           )}
+
+<button
+  onClick={() => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const existing = cart.find((c: any) => c.id === book.id);
+    if (existing) existing.quantity += 1;
+    else cart.push({ ...book, quantity: 1 });
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("✅ Book added to cart!");
+  }}
+  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-white font-medium"
+>
+  Add to Cart
+</button>
+
+<button
+  onClick={() => navigate("/cart")}
+  className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-white font-medium ml-3"
+>
+  Go to Cart
+</button>
+
+
         </div>
       </div>
     </div>
