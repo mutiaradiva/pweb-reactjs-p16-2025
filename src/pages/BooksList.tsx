@@ -3,41 +3,27 @@ import axios from '../api/axiosConfig';
 import BookCard from '../components/BookCard';
 import Loader from '../components/Loader';
 import ErrorBox from '../components/ErrorBox';
-
-type Book = {
-  id: string;
-  title: string;
-  writer: string;
-  price: number;
-  stock: number;
-  genre_id?: string;
-  publish_date?: string;
-};
-
-type Genre = {
-  id: string;
-  name: string;
-};
+import type { Book, Genre } from '../types';
 
 const BooksList: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
-  const [genres, setGenres] = useState<Genre[]>([]);
+  const [genre, setGenre] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  // Fetch genres
   useEffect(() => {
-    const fetchGenres = async () => {
+    const fetchGenre = async () => {
       try {
         const res = await axios.get('/genre');
-        const genresData = res.data.data || res.data || [];
-        setGenres(Array.isArray(genresData) ? genresData : []);
+        const genreData = res.data.data || res.data || [];
+        setGenre(Array.isArray(genreData) ? genreData : []);
       } catch (err) {
-        console.error('Failed to fetch genres:', err);
+        console.error('Failed to fetch genre:', err);
       }
     };
-    fetchGenres();
+    fetchGenre();
   }, []);
 
   // Fetch books
@@ -47,7 +33,6 @@ const BooksList: React.FC = () => {
     try {
       let url = '/books';
       
-      // Jika ada genre filter, gunakan endpoint /books/genre_id
       if (selectedGenre) {
         url = `/books/genre_id?genre_id=${selectedGenre}`;
       }
@@ -70,21 +55,20 @@ const BooksList: React.FC = () => {
     fetchBooks();
   }, [selectedGenre]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this book?')) return;
-    try {
-      await axios.delete(`/books/${id}`);
-      setBooks(prev => prev.filter(b => b.id !== id));
-    } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete');
-    }
-  };
+const handleDelete = async (id: string) => {
+  try {
+    await axios.delete(`/books/${id}`);
+    setBooks(prev => prev.filter(b => b.id !== id));
+    setConfirmDeleteId(null);
+  } catch (err: any) {
+    alert(err?.response?.data?.message || 'Failed to delete');
+  }
+};
 
   if (loading) return <Loader />;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Books Collection</h1>
         <p className="text-gray-400">Browse and manage your book library</p>
@@ -92,7 +76,6 @@ const BooksList: React.FC = () => {
 
       {error && <ErrorBox message={error} />}
 
-      {/* Filters */}
       <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 mb-6">
         <div className="flex gap-3 items-center">
           <label className="text-gray-400 text-sm font-medium">Filter by Genre:</label>
@@ -102,7 +85,7 @@ const BooksList: React.FC = () => {
             className="flex-1 px-4 py-2.5 bg-black border border-gray-800 focus:border-cyan-600 rounded-lg text-white focus:outline-none transition-colors"
           >
             <option value="">All Genres</option>
-            {genres.map(genre => (
+            {genre.map(genre => (
               <option key={genre.id} value={genre.id}>
                 {genre.name}
               </option>
@@ -120,7 +103,6 @@ const BooksList: React.FC = () => {
         </div>
       </div>
 
-      {/* Books Grid */}
       {books.length === 0 ? (
         <div className="text-center py-16">
           <div className="w-16 h-16 bg-gray-900 border border-gray-800 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -134,8 +116,32 @@ const BooksList: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {books.map(book => (
-            <BookCard key={book.id} book={book} onDelete={handleDelete} genres={genres} />
-          ))}
+  <div key={book.id} className="relative">
+    <BookCard book={book} onDelete={() => setConfirmDeleteId(book.id)} genre={genre} />
+
+    {/* Konfirmasi hapus */}
+    {confirmDeleteId === book.id && (
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg border border-gray-700 p-4">
+        <p className="text-gray-300 mb-4">Are you sure you want to delete <span className="font-semibold text-white">{book.title}</span>?</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleDelete(book.id)}
+            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => setConfirmDeleteId(null)}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+))}
+
         </div>
       )}
     </div>
