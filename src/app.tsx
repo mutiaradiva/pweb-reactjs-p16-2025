@@ -9,6 +9,8 @@ import AddBook from "./pages/AddBook";
 import Transactions from "./pages/Transactions";
 import TransactionDetail from "./pages/TransactionDetail";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Cart from "./pages/Cart";
+
 
 const App: React.FC = () => {
   return (
@@ -45,6 +47,14 @@ const App: React.FC = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/cart"
+  element={
+    <ProtectedRoute>
+      <Cart />
+    </ProtectedRoute>
+  }
+/>
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </main>
